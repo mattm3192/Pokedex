@@ -2,7 +2,7 @@ package main
 
 //import "fmt"
 
-func commandMap() error {
+func commandMap(cfg *config) error {
 
 	return nil
 }
