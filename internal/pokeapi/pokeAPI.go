@@ -1,4 +1,4 @@
-package internal
+package pokeapi
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type pokeLocation struct {
+type PokeLocation struct {
 	Count    int     `json:"count"`
 	Next     string  `json:"next"`
 	Previous *string `json:"previous"`
@@ -16,22 +16,22 @@ type pokeLocation struct {
 	} `json:"results"`
 }
 
-func LocationsCall(url *string) (pokeLocation, error) {
+func LocationsCall(url *string) (PokeLocation, error) {
 	resp, err := http.Get(*url)
 	if err != nil {
-		return pokeLocation{}, err
+		return PokeLocation{}, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return pokeLocation{}, err
+		return PokeLocation{}, err
 	}
 
-	var locations pokeLocation
+	var locations PokeLocation
 	err = json.Unmarshal(body, &locations)
 	if err != nil {
-		return pokeLocation{}, err
+		return PokeLocation{}, err
 	}
 
 	return locations, nil
