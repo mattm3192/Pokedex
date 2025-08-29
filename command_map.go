@@ -12,7 +12,6 @@ func commandMap(cfg *config) error {
 	if cfg.nextURL == "" {
 		cfg.nextURL = "https://pokeapi.co/api/v2/location-area/?limit=20&offset=0"
 	} else {
-
 		urlParts := strings.Split(cfg.nextURL, "/")
 		for _, part := range urlParts {
 			if part == "location-area" {
@@ -28,10 +27,19 @@ func commandMap(cfg *config) error {
 	if err != nil {
 		return err
 	}
+	if locations.Next == "" {
+		fmt.Println("You are on the last page, no more locations to list")
+		return nil
+	}
 	for _, location := range locations.Results {
 		fmt.Println(location.Name)
 	}
-	cfg.previousURL = cfg.nextURL
+
+	if locations.Previous != nil {
+		cfg.previousURL = *locations.Previous
+	} else {
+		cfg.previousURL = cfg.nextURL
+	}
 	cfg.nextURL = locations.Next
 	return nil
 }
