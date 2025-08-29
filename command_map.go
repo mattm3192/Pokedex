@@ -1,45 +1,40 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"strings"
-
-	"github.com/mattm3192/Pokedex/internal/pokeapi"
 )
 
 func commandMap(cfg *config) error {
-	isMapURL := false
-	if cfg.nextURL == "" {
-		cfg.nextURL = "https://pokeapi.co/api/v2/location-area/?limit=20&offset=0"
-	} else {
-		urlParts := strings.Split(cfg.nextURL, "/")
-		for _, part := range urlParts {
-			if part == "location-area" {
-				isMapURL = true
-			}
-		}
-	}
-	if !isMapURL {
-		cfg.nextURL = "https://pokeapi.co/api/v2/location-area/?limit=20&offset=0"
-	}
-
-	locations, err := pokeapi.LocationsCall(&cfg.nextURL)
+	locationsResp, err := cfg.pokeapiClient.ListLocations(cfg.nextURL)
 	if err != nil {
 		return err
 	}
-	if locations.Next == "" {
-		fmt.Println("You are on the last page, no more locations to list")
-		return nil
+
+	cfg.nextURL = &locationsResp.Next
+	cfg.previousURL = locationsResp.Previous
+
+	for _, loc := range locationsResp.Results {
+		fmt.Println(loc.Name)
 	}
-	for _, location := range locations.Results {
-		fmt.Println(location.Name)
+	return nil
+}
+
+func commandMapb(cfg *config) error {
+	if cfg.previousURL == nil {
+		return errors.New("you're on the first page")
 	}
 
-	if locations.Previous != nil {
-		cfg.previousURL = *locations.Previous
-	} else {
-		cfg.previousURL = cfg.nextURL
+	locationResp, err := cfg.pokeapiClient.ListLocations(cfg.previousURL)
+	if err != nil {
+		return err
 	}
-	cfg.nextURL = locations.Next
+
+	cfg.nextURL = &locationResp.Next
+	cfg.previousURL = locationResp.Previous
+
+	for _, loc := range locationResp.Results {
+		fmt.Println(loc.Name)
+	}
 	return nil
 }

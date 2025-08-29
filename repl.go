@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/mattm3192/Pokedex/internal/pokeapi"
 )
 
 type cliCommand struct {
@@ -14,12 +16,12 @@ type cliCommand struct {
 }
 
 type config struct {
-	nextURL     string
-	previousURL string
+	pokeapiClient pokeapi.Client
+	nextURL       *string
+	previousURL   *string
 }
 
-func startRepl() {
-	var cfg config
+func startRepl(cfg *config) {
 	reader := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
@@ -33,7 +35,7 @@ func startRepl() {
 		commands := getCommands()
 		command, exists := commands[commandName]
 		if exists {
-			err := command.callback(&cfg)
+			err := command.callback(cfg)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -65,7 +67,7 @@ func getCommands() map[string]cliCommand {
 		"mapb": {
 			name:        "mapb",
 			description: "Displays the previous 20 locations areas if map has been used more than once, otherwise will tell you your on the first page. It's a way to go back.",
-			callback:    commandMapB,
+			callback:    commandMapb,
 		},
 	}
 }
