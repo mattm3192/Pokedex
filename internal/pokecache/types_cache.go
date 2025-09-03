@@ -6,9 +6,8 @@ import (
 )
 
 type Cache struct {
-	entries  map[string]cacheEntry
-	interval time.Duration
-	mu       sync.Mutex
+	entries map[string]cacheEntry
+	mux     *sync.Mutex
 }
 
 type cacheEntry struct {
