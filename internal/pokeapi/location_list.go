@@ -19,7 +19,6 @@ func (c *Client) ListLocations(pageURL *string, cache *pokecache.Cache) (PokeLoc
 
 	cachedData, exists := cache.Get(url)
 	if exists {
-		fmt.Println("Using cached data")
 		err := json.Unmarshal(cachedData, &locationsResp)
 		if err != nil {
 			return PokeLocation{}, err
@@ -37,6 +36,10 @@ func (c *Client) ListLocations(pageURL *string, cache *pokecache.Cache) (PokeLoc
 		return PokeLocation{}, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return PokeLocation{}, fmt.Errorf("unexpected status: %d", resp.StatusCode)
+	}
 
 	dat, err := io.ReadAll(resp.Body)
 	if err != nil {

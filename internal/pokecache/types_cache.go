@@ -6,12 +6,12 @@ import (
 )
 
 type Cache struct {
-	Entries  map[string]cacheEntry
+	entries  map[string]cacheEntry
 	interval time.Duration
 	mu       sync.Mutex
 }
 
 type cacheEntry struct {
 	createdAt time.Time
-	Val       []byte
+	val       []byte
 }

@@ -6,7 +6,7 @@ import (
 
 func NewCache(interval time.Duration) *Cache {
 	newCache := &Cache{
-		Entries:  make(map[string]cacheEntry),
+		entries:  make(map[string]cacheEntry),
 		interval: interval,
 	}
 	go newCache.reapLoop()
@@ -17,18 +17,18 @@ func (c *Cache) Add(key string, val []byte) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	createdtime := time.Now()
-	newCacheEntry := cacheEntry{createdAt: createdtime, Val: val}
-	c.Entries[key] = newCacheEntry
+	newCacheEntry := cacheEntry{createdAt: createdtime, val: val}
+	c.entries[key] = newCacheEntry
 }
 
 func (c *Cache) Get(key string) ([]byte, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	entry, ok := c.Entries[key]
+	entry, ok := c.entries[key]
 	if !ok {
 		return nil, false
 	}
-	return entry.Val, true
+	return entry.val, true
 }
 
 func (c *Cache) reapLoop() {
@@ -36,9 +36,9 @@ func (c *Cache) reapLoop() {
 	defer ticker.Stop()
 	for range ticker.C {
 		c.mu.Lock()
-		for key, entry := range c.Entries {
+		for key, entry := range c.entries {
 			if time.Since(entry.createdAt) > c.interval {
-				delete(c.Entries, key)
+				delete(c.entries, key)
 			}
 		}
 		c.mu.Unlock()
