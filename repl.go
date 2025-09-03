@@ -7,12 +7,13 @@ import (
 	"strings"
 
 	"github.com/mattm3192/Pokedex/internal/pokeapi"
+	"github.com/mattm3192/Pokedex/internal/pokecache"
 )
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, *pokecache.Cache) error
 }
 
 type config struct {
@@ -21,7 +22,7 @@ type config struct {
 	previousURL   *string
 }
 
-func startRepl(cfg *config) {
+func startRepl(cfg *config, cache *pokecache.Cache) {
 	reader := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
@@ -35,7 +36,7 @@ func startRepl(cfg *config) {
 		commands := getCommands()
 		command, exists := commands[commandName]
 		if exists {
-			err := command.callback(cfg)
+			err := command.callback(cfg, cache)
 			if err != nil {
 				fmt.Println(err)
 			}
