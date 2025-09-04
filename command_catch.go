@@ -17,15 +17,15 @@ func commandCatch(cfg *config, args ...string) error {
 		return err
 	}
 	baseExp := pokemonDetails.BaseExperience
-	if baseExp <= 0 {
-		baseExp = 1
+	if baseExp < 40 {
+		baseExp = 40
 	}
 	catchChance := rand.Intn(baseExp)
-	if baseExp/2 >= catchChance {
+	if catchChance > 40 {
 		fmt.Printf("%s escaped!\n", name)
 	} else {
 		fmt.Printf("%s was caught!\n", name)
-		cfg.pokeapiClient.Pokedex[name] = pokemonDetails
+		cfg.caughtPokemon[name] = pokemonDetails
 	}
 	return nil
 }
