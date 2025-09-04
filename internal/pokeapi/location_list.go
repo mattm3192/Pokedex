@@ -53,8 +53,8 @@ func (c *Client) ListLocations(pageURL *string) (PokeLocation, error) {
 	return locationsResp, nil
 }
 
-func (c *Client) ListLocationDetails(id *string) (LocationDetails, error) {
-	url := baseURL + "/location-area/" + *id
+func (c *Client) ListLocationDetails(id string) (LocationDetails, error) {
+	url := baseURL + "/location-area/" + id
 
 	pokemonResp := LocationDetails{}
 
