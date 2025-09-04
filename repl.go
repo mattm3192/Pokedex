@@ -12,7 +12,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, string) error
 }
 
 type config struct {
@@ -35,9 +35,16 @@ func startRepl(cfg *config) {
 		commands := getCommands()
 		command, exists := commands[commandName]
 		if exists {
-			err := command.callback(cfg)
-			if err != nil {
-				fmt.Println(err)
+			if len(words) > 1 {
+				err := command.callback(cfg, words[1])
+				if err != nil {
+					fmt.Println(err)
+				}
+			} else {
+				err := command.callback(cfg, "")
+				if err != nil {
+					fmt.Println(err)
+				}
 			}
 			continue
 		} else {
@@ -51,23 +58,28 @@ func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"exit": {
 			name:        "exit",
-			description: "Exit the Pokedex",
+			description: "Exit the Pokedex.",
 			callback:    commandExit,
 		},
 		"help": {
 			name:        "help",
-			description: "Displays a help message",
+			description: "Displays a help message.",
 			callback:    commandHelp,
 		},
 		"map": {
 			name:        "map",
-			description: "Displays the names of 20 location areas in the Pokemon world, each subsequent call gets the next 20",
+			description: "Displays the names of 20 location areas in the Pokemon world, each subsequent call gets the next 20.",
 			callback:    commandMap,
 		},
 		"mapb": {
 			name:        "mapb",
 			description: "Displays the previous 20 locations areas if map has been used more than once, otherwise will tell you your on the first page. It's a way to go back.",
 			callback:    commandMapb,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Takes the name of a location area as an argument, and will show the user a list of all the Pokemon located there.",
+			callback:    commandExplore,
 		},
 	}
 }
